@@ -8,14 +8,13 @@ body {
   background: #f0f0f0;
 }
 
-@media (prefers-color-scheme: dark) { body { background: #111; } }
-
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 2px; }
 
 /* ── Light theme (default) ── */
 :root {
+  color-scheme: light; 
   --bg1:  #ffffff;
   --bg2:  #f4f4f2;
   --bg3:  #e8e8e6;
@@ -26,15 +25,4 @@ body {
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* ── Dark theme ── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg1: #1c1c1e;
-    --bg2: #2c2c2e;
-    --bg3: #3a3a3c;
-    --t1:  #f2f2f7;
-    --t2:  #8e8e93;
-    --b2:  rgba(255,255,255,.15);
-    --b3:  rgba(255,255,255,.08);
-  }
-}
+
