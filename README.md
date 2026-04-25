@@ -28,44 +28,6 @@ Sin IA, sin backend, sin datos en la nube. Todo vive en el dispositivo del estud
 
 ---
 
-## Estructura del proyecto
-
-```
-src/
-├── App.jsx                          # Shell de navegación
-├── main.jsx                         # Entry point
-├── index.css                        # Variables CSS + reset
-├── db.js                            # Dexie — schema IndexedDB
-│
-├── config/
-│   └── resources.js                 # ← EDITAR AQUÍ teléfonos y emails
-│
-├── data/
-│   └── decisionTree.js              # ← EDITAR AQUÍ los flujos del bot
-│
-├── hooks/
-│   ├── useChatState.js              # Persistencia del chat en IndexedDB
-│   └── useMoodHistory.js            # CRUD del historial de ánimo
-│
-├── utils/
-│   └── styles.js                    # Helpers de estilo compartidos
-│
-└── components/
-    ├── ChatContainer.jsx            # Motor del chat + multi-bubble sender
-    ├── HomePage.jsx                 # Dashboard de inicio
-    ├── MoodTracker.jsx              # Registro de ánimo (BUG del botón corregido)
-    ├── ResourcesPage.jsx            # Página completa de recursos
-    ├── ResourcesCard.jsx            # Tarjeta inline dentro del chat
-    ├── PanicModal.jsx               # Modal de emergencia accesible
-    └── techniques/
-        ├── BreathingExercise.jsx    # Respiración 4-7-8 con SVG animado
-        ├── FiveSensesExercise.jsx   # Técnica 5-4-3-2-1
-        ├── ThoughtChallenge.jsx     # TCC — desafío de pensamientos
-        ├── FiveMinuteTimer.jsx      # Timer de 5 minutos (pacto de procrastinación)
-        └── BrainDumpWidget.jsx      # Externalización + tarea de 5 min
-```
-
----
 
 ## Instalación y uso local
 
@@ -119,17 +81,6 @@ Luego referencialo desde otro nodo con `next: 'mi_nodo_nuevo'`.
 
 ---
 
-## Bugs corregidos en esta versión
-
-| Bug | Causa | Solución |
-|---|---|---|
-| Botón "Guardar registro" no respondía al click | El `textarea` disparaba un `blur` que robaba el foco antes del `onClick` | `onMouseDown + preventDefault()` en el botón — patrón estándar para este caso |
-| Botones de BrainDump y ThoughtChallenge con el mismo bug | Mismo patrón textarea + botón | Misma solución aplicada |
-| `node_modules/` y `dist/` en el repo | Faltaba `.gitignore` | `.gitignore` incluido |
-| Chat volvía a `start` al recargar | Estado guardado en `localStorage` con clave stale | Migración completa a IndexedDB con Dexie — estado restaurado al volver |
-
----
-
 ## Recursos configurados
 
 | Recurso | Contacto |
@@ -139,6 +90,16 @@ Luego referencialo desde otro nodo con `next: 'mi_nodo_nuevo'`.
 | Ministerio de Salud Neuquén | 0800-222-1002 |
 | Secretaría de Bienestar UNCo | +54 299 449-0300 |
 | Email Bienestar UNCo | secretaria.bienestar@central.uncoma.edu.ar |
+
+---
+
+Notas de seguridad
+
+- El chatbot NO usa IA ni hace requests externos
+- No recolecta datos personales
+- Todo se almacena localmente en el dispositivo del usuario
+-  Las derivaciones a profesionales siempre están disponibles
+
 
 ---
 
