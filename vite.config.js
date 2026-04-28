@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { fileURLToPath, URL } from 'node:url'; // Import necesario para los alias
 
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Vite copia public/ a dist/ automáticamente
       includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'Compañero — Bienestar UNCo',
@@ -30,6 +30,12 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      // Definimos que '@' apunte a la carpeta 'src'
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,

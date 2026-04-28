@@ -1,4 +1,4 @@
-import { RESOURCES } from '../config/resources';
+import { RESOURCES } from "@/config/resources.js";
 
 export default function PanicModal({ onClose }) {
   return (

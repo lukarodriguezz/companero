@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-// Importamos los widgets que ya tenés en la carpeta components
-import BreathingExercise from './BreathingExercise';
-import FiveSensesExercise from './FiveSensesExercise';
-import ThoughtChallenge from './ThoughtChallenge';
-import FiveMinuteTimer from './FiveMinuteTimer';
-import BrainDumpWidget from './BrainDumpWidget';
+
+// Usando el alias '@' que apunta a /src
+import BreathingExercise from '@/components/techniques/BreathingExercise.jsx';
+import FiveSensesExercise from '@/components/techniques/FiveSensesExercise.jsx';
+import ThoughtChallenge from '@/components/techniques/ThoughtChallenge.jsx';
+import FiveMinuteTimer from '@/components/techniques/FiveMinuteTimer.jsx';
+import BrainDumpWidget from '@/components/techniques/BrainDumpWidget.jsx';
 
 const ChatContainer = ({ tree }) => {
   const [messages, setMessages] = useState([]);

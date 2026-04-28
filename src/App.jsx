@@ -1,9 +1,14 @@
-import { useState } from 'react';
-import HomePage       from './components/HomePage';
-import ChatContainer  from './components/ChatContainer';
-import MoodTracker    from './components/MoodTracker';
-import ResourcesPage  from './components/ResourcesPage';
-import PanicModal     from './components/PanicModal';
+import { useState } from "react";
+// Componentes
+import HomePage from "@/components/HomePage.jsx";
+import ChatContainer from "@/components/ChatContainer.jsx";
+import MoodTracker from "@/components/MoodTracker.jsx";
+import ResourcesPage from "@/components/ResourcesPage.jsx";
+import PanicModal from "@/components/PanicModal.jsx";
+
+// Datos y Lógica
+import { DECISION_TREE } from "@/data/decisionTree.js";
+import { db } from "@/db.js"; // Ojo: lo tenés en la raíz de src según el find
 
 const NAV = [
   { id: 'home',      icon: '🏠', label: 'Inicio'   },
