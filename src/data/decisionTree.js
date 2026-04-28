@@ -1,261 +1,156 @@
 // ─────────────────────────────────────────────────────────
-// data/decisionTree.js
-//
-// Árbol de decisiones completo del chatbot.
-// Editá este archivo para modificar cualquier flujo sin
-// tocar la lógica de la aplicación.
-//
-// Estructura de nodo:
-//   id           — string único
-//   botMessage   — string | string[]  (array = burbujas separadas)
-//   options      — [{ label, next, flags? }]
-//   isCrisis     — bool: muestra banner de emergencia
-//   isResources  — bool: renderiza ResourcesCard
-//   isTechnique  — bool: activa widget de técnica
-//   techniqueType— 'breathing' | 'senses' | 'thoughts'
-//   isTimer      — bool: activa FiveMinuteTimer
-//   isBrainDump  — bool: activa BrainDumpWidget
-//
-// Flags en options:
-//   isTechniqueStart — lanza widget de técnica al elegir
-//   isTimerStart     — lanza timer de 5 min al elegir
+// data/decisionTree.js (Versión 2.0 - Optimizada)
 // ─────────────────────────────────────────────────────────
 
 export const DECISION_TREE = {
 
+  // ══════════════════════════════════════════════════════
+  // INICIO REESTRUCTURADO - REDUCCIÓN DE CARGA COGNITIVA
+  // ══════════════════════════════════════════════════════
   start: {
     id: 'start',
-    botMessage: '¡Hola! Soy el compañero de bienestar de la UNCo. ¿Qué está pasando?',
+    botMessage: '¡Hola! Soy el compañero de bienestar de la UNCo. ¿En qué te ayudo hoy?',
+    options: [
+      { label: '📚 Problemas con el estudio',         next: 'study_menu' },
+      { label: '🫀 Me siento mal emocionalmente',     next: 'emotions_menu' },
+      { label: '🧠 Quiero usar una técnica rápida',   next: 'techniques_menu' },
+      { label: '🆘 Necesito ayuda urgente',           next: 'crisis_check' },
+    ],
+  },
+
+  study_menu: {
+    id: 'study_menu',
+    botMessage: '¿Qué está pasando con el estudio?',
     options: [
       { label: '😔 Desaprobé / me fue mal',                      next: 'post_fail' },
       { label: '😰 Tengo un examen próximo',                     next: 'stress_exams_triage' },
-      { label: '🌀 Estoy agobiado/a y no sé por dónde empezar', next: 'stress_brain_dump' },
-      { label: '😩 Estoy procrastinando y no arranco',           next: 'stress_procrastination_pact' },
-      { label: '😖 Tengo ansiedad o angustia',                   next: 'anxiety' },
-      { label: '💙 Me siento muy bajón/a',                       next: 'low_mood' },
-      { label: '🧠 Quiero aprender una técnica',                 next: 'techniques_menu' },
-      { label: '🆘 Estoy en una situación muy difícil',          next: 'crisis_check' },
+      { label: '😩 Procrastino y no arranco',                    next: 'stress_procrastination_pact' },
+      { label: 'Volver atrás',                                   next: 'start' },
+    ],
+  },
+
+  emotions_menu: {
+    id: 'emotions_menu',
+    botMessage: 'Entiendo. ¿Cómo describirías lo que sentís ahora?',
+    options: [
+      { label: '🌀 Agobio (no sé por dónde empezar)', next: 'stress_brain_dump' },
+      { label: '😖 Ansiedad o angustia',              next: 'anxiety' },
+      { label: '💙 Tristeza o bajón',                 next: 'low_mood' },
+      { label: 'Volver atrás',                        next: 'start' },
     ],
   },
 
   // ══════════════════════════════════════════════════════
-  // POST-FRACASO — ESCUDO ANTI-ABANDONO
+  // POST-FRACASO — ESCUDO ANTI-ABANDONO (CONDENSADO)
   // ══════════════════════════════════════════════════════
   post_fail: {
     id: 'post_fail',
-    botMessage: ['Desaprobaste.', 'Qué bajón. En serio.', 'Está bien estar mal por esto.', '¿Qué es lo que más te está pegando ahora mismo?'],
+    botMessage: ['Desaprobar duele. Es normal estar mal.', '¿Qué es lo que más te pesa de esto ahora mismo?'],
     options: [
-      { label: 'Estoy pensando en dejar la carrera',  next: 'post_fail_abandon' },
-      { label: 'Estoy muy enojado/a conmigo',         next: 'post_fail_angry' },
-      { label: 'No sé qué hacer ahora',               next: 'post_fail_next_step' },
-      { label: 'Me siento un fracasado/a',            next: 'post_fail_failure_feeling' },
+      { label: 'Quiero dejar la carrera',             next: 'post_fail_abandon' },
+      { label: 'Siento que soy un fracaso',           next: 'post_fail_failure_feeling' },
+      { label: 'No sé qué paso / No sé qué hacer',    next: 'post_fail_next_step' },
     ],
   },
   post_fail_abandon: {
     id: 'post_fail_abandon',
-    botMessage: ['Escuchame.', 'No tomes esa decisión hoy. Ni mañana.', 'Prometeme una sola cosa: 48 horas sin decidir nada sobre la carrera.', 'Después de esas 48 horas hacés lo que quieras. Pero no ahora, con esto fresco.', '¿Trato?'],
+    botMessage: ['Escuchame. Las peores decisiones se toman en el pico de la bronca.', 'Hagamos un trato: dame 48 horas sin tomar decisiones sobre la carrera. Después, hacés lo que quieras.', '¿Tenemos un trato?'],
     options: [
-      { label: 'Trato — 48 horas',                        next: 'post_fail_pact_accepted' },
-      { label: 'No sé si puedo prometerte eso',            next: 'post_fail_pact_soft' },
-      { label: 'Ya tomé la decisión',                      next: 'post_fail_decided' },
+      { label: 'Trato — Espero 48 hs',                    next: 'post_fail_pact_accepted' },
+      { label: 'No, ya lo decidí',                        next: 'post_fail_decided' },
     ],
   },
   post_fail_pact_accepted: {
     id: 'post_fail_pact_accepted',
-    botMessage: ['Dale. Eso es todo lo que necesito.', 'En 48 horas tenés otra conversación con esto.', 'Por ahora, ¿qué necesitás para pasar el día?'],
+    botMessage: ['Excelente. Hablamos en 48 horas con la cabeza fría.', 'Por hoy, cortemos acá. ¿Qué necesitás para pasar el rato?'],
     options: [
-      { label: 'Calmarme un poco',                    next: 'technique_breathing' },
-      { label: 'Hablar más sobre cómo me siento',     next: 'post_fail_feelings' },
-      { label: 'Ver qué hago con la materia',         next: 'post_fail_next_step' },
-    ],
-  },
-  post_fail_pact_soft: {
-    id: 'post_fail_pact_soft',
-    botMessage: ['Está bien, no te pido que lo jures.', 'Solo que antes de tomar una decisión tan grande, duermas al menos una noche.', 'Las decisiones tomadas en el pico de la bronca casi siempre se arrepienten.', '¿Podés hacer eso?'],
-    options: [
-      { label: 'Sí, puedo esperar una noche',         next: 'post_fail_pact_accepted' },
-      { label: 'Quiero hablar con alguien de la UNCo', next: 'resources_info' },
+      { label: 'Bajar la tensión (Respirar)',         next: 'technique_breathing' },
+      { label: 'Hablar de otra cosa',                 next: 'start' },
     ],
   },
   post_fail_decided: {
     id: 'post_fail_decided',
-    botMessage: ['Respeto eso.', 'Solo te pido que esa decisión la tomes acompañado/a.', 'La Secretaría de Bienestar de la UNCo existe exactamente para esto — no para convencerte de nada, sino para acompañarte.'],
+    botMessage: ['Respeto tu decisión. Pero no la transites en soledad.', 'La Secretaría de Bienestar está para orientarte en estos cierres.'],
     options: [
-      { label: 'Ver datos de Bienestar UNCo', next: 'resources_info' },
-      { label: 'Volver al inicio',             next: 'start' },
-    ],
-  },
-  post_fail_angry: {
-    id: 'post_fail_angry',
-    botMessage: ['La bronca con uno mismo es de las más agotadoras.', '¿Le hablarías así a un compañero que desaprobó?', 'Probablemente no. Pero a vos sí.', 'Ese doble estándar tiene un costo muy alto.'],
-    options: [
-      { label: 'Tenés razón, soy muy duro/a conmigo', next: 'technique_thoughts' },
-      { label: 'Igual siento que es mi culpa',         next: 'post_fail_self_blame' },
-    ],
-  },
-  post_fail_self_blame: {
-    id: 'post_fail_self_blame',
-    botMessage: ['Puede ser que algo hayas podido hacer distinto. Eso no te hace un fracasado/a.', 'Un examen es un punto de datos, no una sentencia.', '¿Querés trabajar ese pensamiento?'],
-    options: [
-      { label: 'Sí, quiero desafiar esos pensamientos', next: 'technique_thoughts' },
-      { label: 'Primero necesito calmarme',              next: 'technique_breathing' },
-    ],
-  },
-  post_fail_next_step: {
-    id: 'post_fail_next_step',
-    botMessage: ['Primero: no tomés ninguna decisión grande hoy.', '¿Sabés qué pasó en el examen? ¿Fue una sorpresa o lo venías viendo venir?'],
-    options: [
-      { label: 'Fue una sorpresa, estudié bastante',  next: 'post_fail_surprise' },
-      { label: 'La verdad no estudié lo suficiente',  next: 'post_fail_honest' },
-      { label: 'Ni idea qué salió mal',               next: 'post_fail_unclear' },
-    ],
-  },
-  post_fail_surprise: {
-    id: 'post_fail_surprise',
-    botMessage: ['Eso es particularmente duro — ponés el esfuerzo y no sale.', 'Puede ser el método, la ansiedad en el examen, o cómo tomó el docente.', 'Vale la pena pedirle devolución. ¿Podés hacer eso?'],
-    options: [
-      { label: 'Sí, voy a intentarlo',          next: 'end_positive' },
-      { label: 'Me da miedo hablar con el doc', next: 'anxiety_social' },
-    ],
-  },
-  post_fail_honest: {
-    id: 'post_fail_honest',
-    botMessage: ['Bien que lo reconocés. Eso ya es mucho.', '¿Por qué no pudiste estudiar?'],
-    options: [
-      { label: 'Me bloqueé, procrastiné',              next: 'stress_procrastination_pact' },
-      { label: 'Tuve quilombos personales o laborales', next: 'stress_work_study' },
-      { label: 'La materia no me copa nada',            next: 'post_fail_motivation' },
-    ],
-  },
-  post_fail_unclear: {
-    id: 'post_fail_unclear',
-    botMessage: ['Esa incertidumbre es frustrante.', 'Acción concreta: pedile devolución al docente. Aunque duela, es información.', 'Sin esa info es difícil cambiar algo.'],
-    options: [
-      { label: 'Me da vergüenza pedirlo', next: 'post_fail_self_blame' },
-      { label: 'Dale, voy a intentarlo',  next: 'end_positive' },
-    ],
-  },
-  post_fail_motivation: {
-    id: 'post_fail_motivation',
-    botMessage: ['Estudiar algo que no te interesa consume el doble de energía.', '¿Es esta materia puntual o sentís que toda la carrera perdió sentido?'],
-    options: [
-      { label: 'Es esta materia puntual',                 next: 'end_positive' },
-      { label: 'La carrera en general ya no me convence', next: 'post_fail_abandon' },
-    ],
-  },
-  post_fail_feelings: {
-    id: 'post_fail_feelings',
-    botMessage: 'Contame — ¿qué es lo que más te pesa de todo esto?',
-    options: [
-      { label: 'La decepción con uno mismo',    next: 'post_fail_angry' },
-      { label: 'Miedo a lo que van a pensar',   next: 'anxiety_social' },
-      { label: 'El tiempo que siento que perdí', next: 'post_fail_time' },
+      { label: 'Ver datos de Bienestar UNCo',         next: 'resources_info' },
+      { label: 'Volver al inicio',                    next: 'start' },
     ],
   },
   post_fail_failure_feeling: {
     id: 'post_fail_failure_feeling',
-    botMessage: ['Esa sensación es muy real y muy pesada.', "Pero hay una diferencia enorme entre 'fallé en este examen' y 'soy un fracasado'.", 'Uno es un evento. El otro es una identidad.', '¿Querés trabajar eso?'],
+    botMessage: ['Fallar en un examen es un evento, no tu identidad.', 'Es una nota, no tu valor como persona. ¿Desafiamos ese pensamiento?'],
     options: [
-      { label: 'Sí, quiero desafiar ese pensamiento', next: 'technique_thoughts' },
-      { label: 'Necesito hablar con alguien primero',  next: 'resources_info' },
+      { label: 'Sí, quiero desafiarlo',               next: 'technique_thoughts' },
+      { label: 'Solo necesito calmarme',              next: 'technique_breathing' },
     ],
   },
-  post_fail_time: {
-    id: 'post_fail_time',
-    botMessage: ['El tiempo en la facu nunca se pierde del todo.', 'Incluso una materia que repetís te enseña algo, aunque sea cómo no estudiarla.', 'Lo que sí podés cambiar es lo que viene.'],
+  post_fail_next_step: {
+    id: 'post_fail_next_step',
+    botMessage: ['Paso 1: No decidas nada hoy.', 'Paso 2: Pedile devolución al docente. Aunque incomode, necesitas esa info para ajustar el método.'],
     options: [
-      { label: '¿Por dónde empiezo?', next: 'stress_procrastination_pact' },
-      { label: 'Volver al inicio',    next: 'start' },
+      { label: 'Voy a intentarlo',                    next: 'end_positive' },
+      { label: 'Me da ansiedad el docente',           next: 'anxiety_social' },
     ],
   },
 
   // ══════════════════════════════════════════════════════
-  // TRIAGE DE EXAMEN
+  // TRIAGE DE EXAMEN (TEXTOS ÁGILES)
   // ══════════════════════════════════════════════════════
   stress_exams_triage: {
     id: 'stress_exams_triage',
-    botMessage: '¿Cuándo es el examen?',
+    botMessage: '¿Cuándo rendís?',
     options: [
       { label: 'Hoy o mañana 😰',           next: 'stress_exam_today' },
-      { label: 'Esta semana',               next: 'stress_exam_week' },
+      { label: 'En pocos días',             next: 'stress_exam_week' },
       { label: 'La semana que viene o más', next: 'stress_exam_later' },
     ],
   },
   stress_exam_today: {
     id: 'stress_exam_today',
-    botMessage: ['Bueno. Estudiar todo de cero ya no aplica.', 'Lo que sí podés controlar ahora es el entorno.', 'Chequeo rápido: ¿tenés el DNI? ¿Todo lo que necesitás para entrar al aula?'],
+    botMessage: ['Estudiar de cero ya no sirve.', 'Enfocate en controlar tu entorno: ¿Tenés DNI, agua y lo necesario para entrar?'],
     options: [
-      { label: 'Sí, tengo todo listo',            next: 'stress_exam_today_ready' },
-      { label: 'Me falta algo',                   next: 'stress_exam_today_missing' },
-      { label: 'Necesito calmarme antes que nada', next: 'technique_breathing' },
+      { label: 'Sí, todo listo',                  next: 'stress_exam_today_ready' },
+      { label: 'No, me falta algo',               next: 'stress_exam_today_missing' },
     ],
   },
   stress_exam_today_ready: {
     id: 'stress_exam_today_ready',
-    botMessage: ['Perfecto. Lo más importante ya está resuelto.', '¿Hacemos la respiración 4-7-8 antes de entrar?'],
+    botMessage: ['Perfecto. Antes de entrar, bajemos las pulsaciones.'],
     options: [
-      { label: 'Sí, guiame',              next: 'technique_breathing' },
-      { label: 'Prefiero los 5 sentidos', next: 'technique_5senses' },
-      { label: 'Estoy bien, gracias',     next: 'end_positive' },
+      { label: 'Hacer respiración 4-7-8', next: 'technique_breathing' },
+      { label: 'Estoy bien así, gracias', next: 'end_positive' },
     ],
   },
   stress_exam_today_missing: {
     id: 'stress_exam_today_missing',
-    botMessage: ['Eso sí es urgente.', 'Escribí ahora mismo lo que te falta — en papel, en el celu, donde sea.', 'Tener la lista fuera de la cabeza libera energía para actuar.'],
+    botMessage: ['Resolvelo ya. Anotá qué te falta y a quién podés pedírselo (compañero/familiar).', 'Ocupate de eso, luego respiramos.'],
     options: [
-      { label: 'Ya lo resolví, necesito calmarme', next: 'technique_breathing' },
-      { label: 'No puedo conseguirlo a tiempo',    next: 'stress_exam_today_cant' },
-    ],
-  },
-  stress_exam_today_cant: {
-    id: 'stress_exam_today_cant',
-    botMessage: ['Respirá.', '¿Hay alguien que te lo pueda prestar o acercar? ¿Un compañero, familiar?', 'No lo des por imposible hasta haber preguntado.'],
-    options: [
-      { label: 'Tengo a alguien',  next: 'stress_exam_today_ready' },
-      { label: 'No tengo a nadie', next: 'technique_breathing' },
+      { label: 'Ya está, necesito calmarme', next: 'technique_breathing' },
     ],
   },
   stress_exam_week: {
     id: 'stress_exam_week',
-    botMessage: ['Tenés tiempo real.', 'La trampa es querer estudiar todo. No funciona.', '¿Cuántos días te quedan?'],
+    botMessage: ['Tenés margen, pero no intentes abarcar todo.', 'Identificá los 3 temas clave que más toman y dedicales el 70% de tu tiempo.'],
     options: [
-      { label: '2 o 3 días', next: 'stress_exam_few_days' },
-      { label: '4 a 6 días', next: 'stress_exam_several_days' },
-    ],
-  },
-  stress_exam_few_days: {
-    id: 'stress_exam_few_days',
-    botMessage: ['Dos o tres días es suficiente si vas a lo concreto.', 'Estrategia: identificá los 3 temas que más se toman. Solo esos.', '70% del tiempo a esos 3 temas. ¿Podés hacer ese filtro ahora?'],
-    options: [
-      { label: 'Sí, voy a intentarlo', next: 'end_positive' },
-      { label: 'Me cuesta arrancar',   next: 'stress_procrastination_pact' },
-      { label: 'Tengo ansiedad igual', next: 'technique_5senses' },
-    ],
-  },
-  stress_exam_several_days: {
-    id: 'stress_exam_several_days',
-    botMessage: ['Cinco o seis días bien usados son más que suficientes.', 'Tip: bloques de 45 minutos con 10 de pausa real. Sin el celu esos 45.', '¿Podés probar eso?'],
-    options: [
-      { label: 'Me cuesta concentrarme', next: 'technique_5senses' },
+      { label: 'Me cuesta arrancar',      next: 'stress_procrastination_pact' },
       { label: 'Estudio pero no retengo', next: 'stress_study_retention' },
-      { label: 'Dale, voy a intentarlo', next: 'end_positive' },
+      { label: 'Dale, voy a hacer eso',   next: 'end_positive' },
     ],
   },
   stress_study_retention: {
     id: 'stress_study_retention',
-    botMessage: ["Eso pasa cuando estudiás en modo 'leer y releer'.", 'Cambio concreto: después de leer cada tema, cerrá el libro.', 'Escribí de memoria todo lo que recordés. Aunque sea poco.', 'Eso activa la memoria de una forma que releer nunca hace.'],
+    botMessage: ["Dejá de 'leer y releer'.", 'Leé un tema, cerrá el texto y escribí lo que te acuerdes. La recuperación activa fija la memoria.'],
     options: [
-      { label: 'Lo voy a probar',      next: 'end_positive' },
-      { label: 'Tengo ansiedad igual', next: 'technique_breathing' },
+      { label: 'Voy a probarlo',       next: 'end_positive' },
+      { label: 'Tengo mucha ansiedad', next: 'technique_breathing' },
     ],
   },
   stress_exam_later: {
     id: 'stress_exam_later',
-    botMessage: ['Tenés margen.', 'La angustia con tiempo de sobra suele ser más sobre control que sobre el examen.', '¿Qué es lo que más te genera ansiedad?'],
+    botMessage: ['Falta bastante. Esta ansiedad suele ser miedo al fracaso, no falta de tiempo.', '¿Qué te preocupa más?'],
     options: [
-      { label: 'No sé si voy a llegar con el programa', next: 'stress_exam_several_days' },
-      { label: 'Miedo a que me vaya mal otra vez',       next: 'post_fail_failure_feeling' },
-      { label: 'Tengo ansiedad de fondo siempre',        next: 'anxiety_chronic' },
+      { label: 'El volumen de estudio',               next: 'stress_exam_week' },
+      { label: 'Miedo a que me vaya mal de nuevo',    next: 'post_fail_failure_feeling' },
     ],
   },
 
@@ -265,21 +160,21 @@ export const DECISION_TREE = {
   stress_brain_dump: {
     id: 'stress_brain_dump',
     isBrainDump: true,
-    botMessage: ['Dale.', 'Escribí todo lo que te tiene harto/a ahora mismo.', 'Todo. Sin filtro. No tiene que tener sentido.'],
+    botMessage: ['Volquemos la cabeza.', 'Anotá TODO lo que te tiene harto/a o pendiente. Sin filtro.'],
     options: [],
   },
   stress_brain_dump_go: {
     id: 'stress_brain_dump_go',
     isBrainDumpTask: true,
-    botMessage: ['Bien. Ya lo sacaste afuera.', 'Ahora la parte difícil: de todo lo que escribiste, ¿cuál es la única cosa que tomás 5 minutos o menos?'],
+    botMessage: ['Bien. De todo eso, elegí UNA sola cosa que te tome 5 minutos o menos resolver.'],
     options: [],
   },
   stress_brain_dump_commit: {
     id: 'stress_brain_dump_commit',
-    botMessage: ['Eso. Una sola cosa.', '¿La hacés ahora o en los próximos 20 minutos?'],
+    botMessage: ['Esa es tu única misión ahora.', '¿La hacemos ya?'],
     options: [
-      { label: 'Ahora mismo',                            next: 'end_positive' },
-      { label: 'En 20 minutos, necesito calmarme antes', next: 'technique_breathing' },
+      { label: 'Sí, ahora mismo',                        next: 'end_positive' },
+      { label: 'Necesito bajar la ansiedad primero',     next: 'technique_breathing' },
     ],
   },
 
@@ -288,7 +183,7 @@ export const DECISION_TREE = {
   // ══════════════════════════════════════════════════════
   stress_procrastination_pact: {
     id: 'stress_procrastination_pact',
-    botMessage: ['Escuchame.', '¿Hacemos un trato?', 'Estudiá solo 5 minutos. Yo te aviso cuando pasen.', 'Si después querés dejar, tenés mi permiso.', '¿Aceptás?'],
+    botMessage: ['Hagamos un trato: Sentate a estudiar solo 5 minutos. Yo te aviso.', 'Si a los 5 minutos querés dejar, lo dejás. ¿Aceptás?'],
     options: [
       { label: 'Acepto — 5 minutos', next: 'stress_procrastination_timer', isTimerStart: true },
       { label: 'No me convence',     next: 'stress_procrastination_resist' },
@@ -297,246 +192,142 @@ export const DECISION_TREE = {
   stress_procrastination_timer: {
     id: 'stress_procrastination_timer',
     isTimer: true,
-    botMessage: ['Arrancá. Yo cuento el tiempo.'],
+    botMessage: ['Arrancá. El tiempo corre.'],
     options: [],
   },
   stress_procrastination_after: {
     id: 'stress_procrastination_after',
-    botMessage: ['¡Cinco minutos!', '¿Cómo estás? ¿Seguís o paramos acá?'],
+    botMessage: ['¡Tiempo!', '¿Seguimos o frenamos acá?'],
     options: [
-      { label: 'Sigo — ya enganché',            next: 'end_positive' },
-      { label: 'Paro, pero me siento mejor',    next: 'end_positive' },
-      { label: 'No pude concentrarme igual',    next: 'stress_procrastination_hard' },
+      { label: 'Sigo, ya enganché',             next: 'end_positive' },
+      { label: 'Freno, no me concentro',        next: 'stress_procrastination_hard' },
     ],
   },
   stress_procrastination_hard: {
     id: 'stress_procrastination_hard',
-    botMessage: ['Está bien. A veces hay algo más adentro bloqueando.', '¿Qué pasa cuando intentás arrancar?'],
+    botMessage: ['A veces hay una barrera emocional invisible.', '¿Por qué creés que te cuesta tanto arrancar hoy?'],
     options: [
-      { label: 'Me da miedo no hacerlo bien',    next: 'stress_imposter' },
-      { label: 'La materia no me interesa nada', next: 'post_fail_motivation' },
-      { label: 'Estoy agotado/a, sin energía',   next: 'low_tired' },
+      { label: 'Miedo a no ser suficiente',      next: 'stress_imposter' },
+      { label: 'Estoy al límite de energía',     next: 'low_tired' },
     ],
   },
   stress_procrastination_resist: {
     id: 'stress_procrastination_resist',
-    botMessage: '¿Qué es lo que más te genera resistencia para arrancar?',
+    botMessage: '¿Qué te está frenando realmente?',
     options: [
-      { label: 'Miedo a hacerlo mal',      next: 'stress_imposter' },
-      { label: 'No sé por dónde empezar', next: 'stress_brain_dump' },
-      { label: 'Me falta energía',         next: 'low_tired' },
+      { label: 'Siento que soy un fraude', next: 'stress_imposter' },
+      { label: 'No tengo energía',         next: 'low_tired' },
     ],
   },
-
-  // ══════════════════════════════════════════════════════
-  // ESTRÉS — COMPLEMENTARIOS
-  // ══════════════════════════════════════════════════════
   stress_imposter: {
     id: 'stress_imposter',
-    botMessage: ['Lo que describís tiene nombre: síndrome del impostor.', 'Lo experimenta el 70% de los estudiantes universitarios. Los más comprometidos más que nadie.', "Cuando aparezca ese pensamiento, decite: 'Ahí está el impostor de nuevo.' No como verdad — como ruido de fondo."],
+    botMessage: ['Síndrome del impostor. Le pasa al 70% de los universitarios.', "Cuando el pensamiento aparezca, decite: 'Ahí está el ruido otra vez'. No es una verdad."],
     options: [
-      { label: 'Quiero desafiar esos pensamientos', next: 'technique_thoughts' },
-      { label: 'Igual siento que es verdad',         next: 'stress_imposter_deep' },
-    ],
-  },
-  stress_imposter_deep: {
-    id: 'stress_imposter_deep',
-    botMessage: ['El hecho de que te lo cuestionés es señal de que te importa.', 'Los que realmente no sirven para algo no se preguntan si sirven.'],
-    options: [
-      { label: 'Quiero desafiar ese pensamiento',   next: 'technique_thoughts' },
-      { label: 'No recuerdo nada bueno de la facu', next: 'low_sadness' },
-    ],
-  },
-  stress_work_study: {
-    id: 'stress_work_study',
-    botMessage: ['Trabajar y estudiar a la vez es una de las combinaciones más exigentes.', 'Primero: reconocé que lo que hacés requiere mucha fortaleza.', '¿Hay aunque sea una hora por día que sea solo tuya?'],
-    options: [
-      { label: 'No, no tengo ese tiempo',         next: 'stress_work_no_time' },
-      { label: 'Tengo tiempo pero lo uso mal',     next: 'stress_procrastination_pact' },
-      { label: 'Estoy al límite emocionalmente',  next: 'crisis_check' },
-    ],
-  },
-  stress_work_no_time: {
-    id: 'stress_work_no_time',
-    botMessage: ['Eso es agotador de sostener.', 'No hay técnica que reemplace el descanso.', '¿Está en tus posibilidades reducir algo, aunque sea un poco?'],
-    options: [
-      { label: 'No puedo cambiar nada',        next: 'resources_info' },
-      { label: 'Quizás algo sí puedo ajustar', next: 'end_positive' },
-      { label: 'Necesito hablar con alguien',  next: 'resources_info' },
+      { label: 'Quiero desafiar ese pensamiento', next: 'technique_thoughts' },
+      { label: 'Volver al inicio',                next: 'start' },
     ],
   },
 
   // ══════════════════════════════════════════════════════
-  // CRISIS — INTERVENCIÓN FÍSICA PRIMERO
+  // CRISIS — INTERVENCIÓN DIRECTA
   // ══════════════════════════════════════════════════════
   crisis_check: {
     id: 'crisis_check',
-    botMessage: ['Entiendo que estás pasando algo difícil.', '¿Estás teniendo pensamientos de hacerte daño o de que estarías mejor muerto/a?'],
+    botMessage: ['Estoy acá.', '¿Estás teniendo pensamientos sobre hacerte daño o no querer vivir?'],
     options: [
       { label: 'Sí, tengo esos pensamientos', next: 'crisis_physical' },
-      { label: 'No, pero estoy muy mal',       next: 'crisis_medium' },
-      { label: 'Solo necesito desahogarme',   next: 'crisis_vent' },
+      { label: 'No, pero me siento muy mal',  next: 'crisis_medium' },
     ],
   },
   crisis_physical: {
     id: 'crisis_physical',
-    botMessage: ['Gracias por decirme esto.', 'Antes de seguir, necesito que hagas una sola cosa:', 'Buscá un hielo o mojate la cara con agua muy fría ahora mismo.', 'Avisame cuando lo hayas hecho.'],
+    botMessage: ['Gracias por confiarme esto.', 'Necesito que hagas algo físico ahora mismo: buscá un hielo o lavate la cara con agua muy fría.', 'Avisame cuando lo hagas.'],
     options: [
       { label: 'Ya lo hice',                 next: 'crisis_physical_after' },
-      { label: 'No puedo levantarme ahora', next: 'crisis_high' },
+      { label: 'No puedo hacerlo',           next: 'crisis_high' },
     ],
   },
   crisis_physical_after: {
     id: 'crisis_physical_after',
-    botMessage: ['Bien.', 'Ese frío activa el nervio vago y corta el pico de adrenalina — no es un truco, es fisiología.', '¿Cómo estás ahora mismo?'],
+    botMessage: ['Bien. El frío activa el nervio vago y frena el pico de alerta.', '¿Te sentís un poco más en tierra?'],
     options: [
-      { label: 'Todavía tengo esos pensamientos', next: 'crisis_high' },
-      { label: 'Estoy un poco más calmado/a',     next: 'crisis_medium' },
+      { label: 'Todavía me siento en peligro', next: 'crisis_high' },
+      { label: 'Estoy un poco mejor',          next: 'crisis_medium' },
     ],
   },
   crisis_high: {
     id: 'crisis_high',
     isCrisis: true,
-    botMessage: ['Estoy muy contento/a de que me lo hayas dicho.', 'Lo que sentís merece atención profesional ahora.', 'Por favor, contactá a Bienestar Estudiantil de la UNCo o a una línea de crisis.', 'No tenés que pasar por esto solo/a.'],
-    options: [{ label: 'Ver recursos de ayuda ahora', next: 'resources_emergency' }],
+    botMessage: ['Lo que sentís es demasiado pesado para cargarlo a solas. Merecés ayuda profesional ya.', 'Te dejo los contactos de emergencia.'],
+    options: [{ label: 'Ver recursos de emergencia', next: 'resources_emergency' }],
   },
   crisis_medium: {
     id: 'crisis_medium',
-    botMessage: ['Estar muy mal emocionalmente es razón suficiente para buscar apoyo.', "No necesitás estar 'en crisis total' para merecer ayuda.", '¿Querés los datos de Bienestar UNCo?'],
+    botMessage: ["No necesitás estar 'en riesgo total' para pedir apoyo.", 'La UNCo tiene espacios para esto.'],
     options: [
-      { label: 'Sí, quiero los datos',               next: 'resources_info' },
-      { label: 'Prefiero intentar una técnica antes', next: 'techniques_menu' },
-    ],
-  },
-  crisis_vent: {
-    id: 'crisis_vent',
-    botMessage: 'Acá estoy. Contame lo que quieras.',
-    options: [
-      { label: 'Estoy agotado/a de todo',        next: 'low_tired' },
-      { label: 'Me siento muy solo/a',           next: 'low_lonely' },
-      { label: 'Algo me tiene muy angustiado/a', next: 'anxiety_chronic' },
-      { label: 'Desaprobé y no sé qué hacer',    next: 'post_fail' },
+      { label: 'Ver recursos de Bienestar',          next: 'resources_info' },
+      { label: 'Quiero probar una técnica para calmarme', next: 'techniques_menu' },
     ],
   },
 
   // ══════════════════════════════════════════════════════
-  // ANSIEDAD
+  // ANSIEDAD Y BAJÓN (CONSOLIDADOS)
   // ══════════════════════════════════════════════════════
   anxiety: {
     id: 'anxiety',
-    botMessage: '¿Cómo la estás sintiendo?',
+    botMessage: '¿Cómo la percibís?',
     options: [
-      { label: 'Estoy ansioso/a ahora mismo',              next: 'anxiety_now' },
-      { label: 'Es una angustia constante de fondo',       next: 'anxiety_chronic' },
-      { label: 'Tuve un ataque de pánico',                 next: 'anxiety_panic' },
-      { label: 'Miedo a exposiciones / hablar en público', next: 'anxiety_social' },
+      { label: 'Ansiedad aguda ahora mismo / Pánico', next: 'anxiety_now' },
+      { label: 'Ansiedad constante / de fondo',       next: 'anxiety_chronic' },
+      { label: 'Ansiedad social (Exposiciones)',      next: 'anxiety_social' },
     ],
   },
   anxiety_now: {
     id: 'anxiety_now',
-    botMessage: ['Bien que me lo decís.', 'Cuando la ansiedad está activa, lo mejor es anclarte al cuerpo.', '¿Probamos la técnica de los 5 sentidos ahora mismo?'],
+    botMessage: ['Para la ansiedad activa, lo mejor es anclar la mente al cuerpo.', '¿Probamos los 5 sentidos?'],
     options: [
-      { label: 'Sí, guiame',               next: 'technique_5senses' },
-      { label: 'Prefiero respiración',      next: 'technique_breathing' },
-      { label: 'Solo necesitaba contarlo', next: 'anxiety_just_talk' },
-    ],
-  },
-  anxiety_just_talk: {
-    id: 'anxiety_just_talk',
-    botMessage: ['Está bien. A veces nombrarlo alcanza.', 'La ansiedad es una respuesta normal de tu cuerpo — no estás roto/a.', 'Va a pasar.'],
-    options: [
-      { label: 'Quiero explorar técnicas igual', next: 'techniques_menu' },
-      { label: 'Volver al inicio',               next: 'start' },
+      { label: 'Sí, vamos',                   next: 'technique_5senses' },
+      { label: 'Prefiero la respiración',     next: 'technique_breathing' },
     ],
   },
   anxiety_chronic: {
     id: 'anxiety_chronic',
-    botMessage: ['Una angustia constante es agotadora.', 'Si está interfiriendo con tu vida diaria, hablar con un profesional puede cambiar mucho.', 'La Secretaría de Bienestar de la UNCo tiene atención psicológica gratuita para estudiantes.'],
+    botMessage: ['Sostener eso desgasta muchísimo. Hablar con Bienestar Estudiantil puede darte herramientas de largo plazo.'],
     options: [
-      { label: 'Quiero aprender técnicas',         next: 'techniques_menu' },
-      { label: 'Quiero hablar con Bienestar UNCo', next: 'resources_info' },
-      { label: 'Volver al inicio',                 next: 'start' },
-    ],
-  },
-  anxiety_panic: {
-    id: 'anxiety_panic',
-    botMessage: ['Los ataques de pánico son aterradores, pero no son peligrosos físicamente.', 'Lo que ayuda: no resistirlo. Aceptar que está pasando lo acorta.', '¿Estás en uno ahora o fue antes?'],
-    options: [
-      { label: 'Estoy en uno ahora',                     next: 'crisis_physical' },
-      { label: 'Fue antes, quiero aprender a manejarlo', next: 'technique_breathing' },
+      { label: 'Ver recursos UNCo',               next: 'resources_info' },
+      { label: 'Aprender técnicas de manejo',     next: 'techniques_menu' },
     ],
   },
   anxiety_social: {
     id: 'anxiety_social',
-    botMessage: ["En lugar de 'tengo que salir bien', probá 'estoy compartiendo lo que sé'.", 'La presión baja cuando el foco sale de vos.'],
+    botMessage: ["Cambiá el 'tengo que salir perfecto' por 'estoy compartiendo lo que sé'. Bajar el ego baja la presión."],
     options: [
-      { label: 'Quiero técnica para los nervios previos', next: 'technique_breathing' },
-      { label: 'Quiero trabajar los pensamientos',        next: 'technique_thoughts' },
-      { label: 'Volver al inicio',                        next: 'start' },
+      { label: 'Desafiar pensamientos', next: 'technique_thoughts' },
+      { label: 'Volver al inicio',      next: 'start' },
     ],
   },
-
-  // ══════════════════════════════════════════════════════
-  // ESTADO DE ÁNIMO BAJO
-  // ══════════════════════════════════════════════════════
   low_mood: {
     id: 'low_mood',
-    botMessage: 'Gracias por contarme. ¿Cómo lo describirías?',
+    botMessage: '¿Es tristeza o un agotamiento total de energía?',
     options: [
-      { label: 'Tristeza, no tengo ganas de nada',  next: 'low_sadness' },
-      { label: 'Me siento solo/a o desconectado/a', next: 'low_lonely' },
-      { label: 'Pensamientos de hacerme daño',      next: 'crisis_physical' },
-      { label: 'Estoy agotado/a, sin energía',      next: 'low_tired' },
+      { label: 'Tristeza prolongada / Soledad', next: 'low_sadness' },
+      { label: 'Agotamiento mental total',      next: 'low_tired' },
     ],
   },
   low_sadness: {
     id: 'low_sadness',
-    botMessage: ['Estar triste y sin ganas no significa que algo esté mal en vos.', 'Es una señal de que algo necesita atención.', '¿Hace cuánto viene esto?'],
+    botMessage: ['La soledad y la tristeza en la facu son muy comunes.', 'Obligate a salir 10 minutos al sol hoy. Y considerá hablar con alguien si llevas así varias semanas.'],
     options: [
-      { label: 'Más de dos semanas', next: 'resources_info' },
-      { label: 'Es algo reciente',   next: 'low_recent' },
-    ],
-  },
-  low_recent: {
-    id: 'low_recent',
-    botMessage: ['Salir aunque sea 10 minutos al sol. Moverte un poco. Hablar con alguien.', 'Y permitirte estar mal — no tenés que estar bien todo el tiempo.'],
-    options: [
-      { label: 'Quiero técnicas para salir del bajón', next: 'techniques_menu' },
-      { label: 'Necesito hablar con alguien',           next: 'resources_info' },
-      { label: 'Volver al inicio',                      next: 'start' },
-    ],
-  },
-  low_lonely: {
-    id: 'low_lonely',
-    botMessage: ['La soledad en la facu es más común de lo que parece.', 'No busques "hacer amigos" en abstracto.', 'Buscá una actividad que te cope y aparecés. La conexión viene sola.'],
-    options: [
-      { label: 'Me cuesta conectar con la gente', next: 'low_connect' },
-      { label: 'Quiero recursos de apoyo',         next: 'resources_info' },
-      { label: 'Volver al inicio',                 next: 'start' },
-    ],
-  },
-  low_connect: {
-    id: 'low_connect',
-    botMessage: ["Hacele una pregunta genuina a alguien que ya conocés — '¿cómo te fue en el parcial?' puede ser el inicio.", 'La profundidad viene con el tiempo.'],
-    options: [
-      { label: 'Volver al inicio',                 next: 'start' },
-      { label: 'Quiero hablar con un profesional', next: 'resources_info' },
+      { label: 'Contactar a Bienestar', next: 'resources_info' },
+      { label: 'Volver al inicio',      next: 'start' },
     ],
   },
   low_tired: {
     id: 'low_tired',
-    botMessage: ['El agotamiento mental es tan real como el físico.', "¿Cuándo fue la última vez que hiciste algo solo por placer, sin que fuera 'útil'?"],
+    botMessage: ['El sistema colapsa cuando todo es "deber" y nada es "placer".', '¿Hace cuánto no hacés algo solo porque te divierte?'],
     options: [
-      { label: 'No recuerdo',                              next: 'low_tired_deep' },
-      { label: 'Quiero técnica para descansar la mente', next: 'technique_breathing' },
-    ],
-  },
-  low_tired_deep: {
-    id: 'low_tired_deep',
-    botMessage: ['Eso me preocupa un poco.', 'Cuando dejamos de hacer cosas por placer durante mucho tiempo, el sistema se vacía.', '¿Podés acordarte de algo que antes te gustaba hacer?'],
-    options: [
-      { label: 'Sí, se me ocurre algo',     next: 'end_positive' },
-      { label: 'No, no me acuerdo de nada', next: 'resources_info' },
+      { label: 'No lo recuerdo',        next: 'resources_info' },
+      { label: 'Voy a buscar un rato libre', next: 'end_positive' },
     ],
   },
 
@@ -545,92 +336,77 @@ export const DECISION_TREE = {
   // ══════════════════════════════════════════════════════
   techniques_menu: {
     id: 'techniques_menu',
-    botMessage: '¿Cuál querés explorar?',
+    botMessage: 'Elegí una herramienta:',
     options: [
-      { label: '🌬 Respiración 4-7-8',            next: 'technique_breathing' },
-      { label: '👁 Técnica 5 sentidos',            next: 'technique_5senses' },
-      { label: '💭 Desafío de pensamientos (TCC)', next: 'technique_thoughts' },
+      { label: '🌬 Respiración 4-7-8 (Calma rápida)',      next: 'technique_breathing' },
+      { label: '👁 5 Sentidos (Para ataques de ansiedad)', next: 'technique_5senses' },
+      { label: '💭 Desafío Cognitivo (Para pensamientos)', next: 'technique_thoughts' },
     ],
   },
   technique_breathing: {
     id: 'technique_breathing',
     isTechnique: true,
     techniqueType: 'breathing',
-    botMessage: ['La respiración 4-7-8 activa el sistema nervioso parasimpático.', 'Básicamente le avisa a tu cuerpo que puede relajarse.', 'Presioná el botón para empezar.'],
-    options: [{ label: 'Iniciar respiración guiada', next: 'technique_breathing_end', isTechniqueStart: true }],
+    botMessage: ['Esta técnica apaga la alerta de tu sistema nervioso.'],
+    options: [{ label: 'Iniciar respiración', next: 'technique_breathing_end', isTechniqueStart: true }],
   },
   technique_breathing_end: {
     id: 'technique_breathing_end',
-    botMessage: ['Muy bien.', 'Con 2-3 veces por día, en una semana notás la diferencia.', '¿Cómo te sentís?'],
+    botMessage: ['¿Mejor?'],
     options: [
-      { label: 'Mejor, gracias',                         next: 'end_positive' },
-      { label: 'Quiero probar otra técnica',              next: 'techniques_menu' },
-      { label: 'Quiero hablar más sobre lo que me pasa', next: 'start' },
+      { label: 'Sí, gracias',                 next: 'end_positive' },
+      { label: 'Volver al menú',              next: 'start' },
     ],
   },
   technique_5senses: {
     id: 'technique_5senses',
     isTechnique: true,
     techniqueType: 'senses',
-    botMessage: ['La técnica 5-4-3-2-1 te ancla al presente.', 'Es muy efectiva cuando la ansiedad te lleva al futuro.', 'Empecemos.'],
-    options: [{ label: 'Iniciar técnica de los 5 sentidos', next: 'technique_5senses_end', isTechniqueStart: true }],
+    botMessage: ['Ideal para frenar el loop mental y anclarte al presente.'],
+    options: [{ label: 'Iniciar técnica', next: 'technique_5senses_end', isTechniqueStart: true }],
   },
   technique_5senses_end: {
     id: 'technique_5senses_end',
-    botMessage: ['Excelente.', 'Usaste los sentidos para interrumpir el loop de ansiedad.', '¿Cómo te quedaste?'],
+    botMessage: ['Bien hecho. Interrumpiste el piloto automático.'],
     options: [
-      { label: 'Me ayudó mucho',              next: 'end_positive' },
-      { label: 'Quiero probar otra técnica',  next: 'techniques_menu' },
-      { label: 'Necesito hablar con alguien', next: 'resources_info' },
+      { label: 'Me sirvió',                   next: 'end_positive' },
+      { label: 'Volver al inicio',            next: 'start' },
     ],
   },
   technique_thoughts: {
     id: 'technique_thoughts',
     isTechnique: true,
     techniqueType: 'thoughts',
-    botMessage: ['Esta técnica viene de la Terapia Cognitivo-Conductual.', 'Los pensamientos no son hechos. Los podemos cuestionar.', 'Vamos paso a paso.'],
-    options: [{ label: 'Iniciar desafío de pensamientos', next: 'technique_thoughts_end', isTechniqueStart: true }],
+    botMessage: ['Vamos a cuestionar la validez de esos pensamientos negativos.'],
+    options: [{ label: 'Iniciar desafío', next: 'technique_thoughts_end', isTechniqueStart: true }],
   },
   technique_thoughts_end: {
     id: 'technique_thoughts_end',
-    botMessage: ['Con práctica, tu mente aprende a hacer esto automáticamente.', 'Al principio cuesta. Después se vuelve natural.', '¿Querés seguir trabajando algo?'],
-    options: [
-      { label: 'Quiero practicar otra técnica', next: 'techniques_menu' },
-      { label: 'Volver al inicio',              next: 'start' },
-    ],
+    botMessage: ['Cuesta al principio, pero luego la mente lo automatiza.'],
+    options: [{ label: 'Entendido', next: 'end_positive' }],
   },
 
   // ══════════════════════════════════════════════════════
-  // RECURSOS
+  // RECURSOS Y CIERRE
   // ══════════════════════════════════════════════════════
   resources_info: {
     id: 'resources_info',
     isResources: true,
-    botMessage: 'Acá tenés los recursos disponibles. Todos gratuitos y confidenciales:',
+    botMessage: 'Acá tenés los recursos gratuitos de la UNCo:',
     options: [{ label: 'Volver al inicio', next: 'start' }],
   },
   resources_emergency: {
     id: 'resources_emergency',
     isResources: true,
     isCrisis: true,
-    botMessage: 'Bien que buscaste ayuda. Estos son los recursos más importantes:',
+    botMessage: 'Líneas de ayuda urgente y directa:',
     options: [{ label: 'Volver al inicio', next: 'start' }],
   },
-
-  // ══════════════════════════════════════════════════════
-  // CIERRE
-  // ══════════════════════════════════════════════════════
   end_positive: {
     id: 'end_positive',
-    botMessage: ['Me alegra haberte acompañado.', 'Cuidar tu salud mental es tan importante como estudiar.', '¿Hay algo más en lo que te pueda ayudar?'],
+    botMessage: ['Me alegro de haberte acompañado.', 'Acordate que el botón de ayuda siempre está ahí.'],
     options: [
-      { label: 'Sí, quiero explorar más', next: 'start' },
-      { label: 'No, por ahora está bien', next: 'end_final' },
+      { label: 'Empezar de nuevo', next: 'start' },
     ],
-  },
-  end_final: {
-    id: 'end_final',
-    botMessage: ['Perfecto.', 'Podés volver cuando quieras. El botón de ayuda siempre está arriba.', '¡Cuidate!'],
-    options: [{ label: 'Empezar de nuevo', next: 'start' }],
   },
 };
