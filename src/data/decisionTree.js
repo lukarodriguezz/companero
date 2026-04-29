@@ -1,11 +1,12 @@
-// ─────────────────────────────────────────────────────────
-// data/decisionTree.js (Versión 2.0 - Arquitectura Final)
-// ─────────────────────────────────────────────────────────
-
+/**
+ * DECISION_TREE - Versión 2.0 Definitiva
+ * Árbol de decisiones para el acompañamiento emocional de la UNCo.
+ * Contiene banderas lógicas (isTechnique, isTimer, isResources) que activan widgets en el chat.
+ */
 export const DECISION_TREE = {
 
   // ══════════════════════════════════════════════════════
-  // INICIO - PUNTOS DE ENTRADA (APP & HOMEPAGE)
+  // NODOS DE ENTRADA (START POINTS)
   // ══════════════════════════════════════════════════════
   start: {
     id: 'start',
@@ -155,13 +156,15 @@ export const DECISION_TREE = {
   },
 
   // ══════════════════════════════════════════════════════
-  // BRAIN DUMP (AGOBIO) - FIX DE FLUIJE
+  // BRAIN DUMP (AGOBIO)
   // ══════════════════════════════════════════════════════
   stress_brain_dump: {
     id: 'stress_brain_dump',
     isBrainDump: true,
     botMessage: ['Anotá TODO lo que tenés pendiente o te preocupa sin filtro.'],
-    options: [], // El Widget llama automáticamente a 'stress_brain_dump_go' al terminar
+    options: [
+      { label: 'Ya lo anoté', next: 'stress_brain_dump_go' }
+    ],
   },
   stress_brain_dump_go: {
     id: 'stress_brain_dump_go',
@@ -194,7 +197,7 @@ export const DECISION_TREE = {
     id: 'stress_procrastination_timer',
     isTimer: true,
     botMessage: ['Arrancá. El tiempo corre.'],
-    options: [], // El temporizador llama a 'stress_procrastination_after' al terminar
+    options: [], 
   },
   stress_procrastination_after: {
     id: 'stress_procrastination_after',
@@ -296,4 +299,119 @@ export const DECISION_TREE = {
     botMessage: ['Sostener esto desgasta mucho. Hablá con Bienestar.'],
     options: [
       { label: 'Ver recursos UNCo',               next: 'resources_info' },
-      { label: 'Aprender técnicas',
+      { label: 'Aprender técnicas',               next: 'techniques_menu' },
+    ],
+  },
+  anxiety_social: {
+    id: 'anxiety_social',
+    botMessage: ["Bajemos la presión: estás compartiendo lo que sabés."],
+    options: [
+      { label: 'Desafiar pensamientos', next: 'technique_thoughts' },
+      { label: 'Volver al inicio',      next: 'start' },
+    ],
+  },
+  low_mood: {
+    id: 'low_mood',
+    botMessage: '¿Es tristeza o agotamiento?',
+    options: [
+      { label: 'Tristeza prolongada', next: 'low_sadness' },
+      { label: 'Agotamiento total',  next: 'low_tired' },
+    ],
+  },
+  low_sadness: {
+    id: 'low_sadness',
+    botMessage: ['Tratá de salir 10 min al sol hoy y considerá pedir ayuda.'],
+    options: [
+      { label: 'Ver recursos', next: 'resources_info' },
+      { label: 'Volver al inicio', next: 'start' },
+    ],
+  },
+  low_tired: {
+    id: 'low_tired',
+    botMessage: ['Falta ocio. ¿Hace cuánto no te divertís?'],
+    options: [
+      { label: 'No lo recuerdo',        next: 'resources_info' },
+      { label: 'Voy a buscar un rato', next: 'end_positive' },
+    ],
+  },
+
+  // ══════════════════════════════════════════════════════
+  // TÉCNICAS
+  // ══════════════════════════════════════════════════════
+  techniques_menu: {
+    id: 'techniques_menu',
+    botMessage: 'Elegí una herramienta:',
+    options: [
+      { label: '🌬 Respiración 4-7-8',      next: 'technique_breathing' },
+      { label: '👁 5 Sentidos',             next: 'technique_5senses' },
+      { label: '💭 Desafío Cognitivo',      next: 'technique_thoughts' },
+    ],
+  },
+  technique_breathing: {
+    id: 'technique_breathing',
+    isTechnique: true,
+    techniqueType: 'breathing',
+    botMessage: ['Iniciemos la calma rápida.'],
+    options: [], 
+  },
+  technique_breathing_end: {
+    id: 'technique_breathing_end',
+    botMessage: ['¿Cómo estás?'],
+    options: [
+      { label: 'Mejor, gracias',     next: 'end_positive' },
+      { label: 'Volver al inicio',   next: 'start' },
+    ],
+  },
+  technique_5senses: {
+    id: 'technique_5senses',
+    isTechnique: true,
+    techniqueType: 'senses',
+    botMessage: ['Vamos a anclarnos al presente.'],
+    options: [], 
+  },
+  technique_5senses_end: {
+    id: 'technique_5senses_end',
+    botMessage: ['¡Bien hecho!'],
+    options: [
+      { label: 'Me sirvió',          next: 'end_positive' },
+      { label: 'Volver al inicio',   next: 'start' },
+    ],
+  },
+  technique_thoughts: {
+    id: 'technique_thoughts',
+    isTechnique: true,
+    techniqueType: 'thoughts',
+    botMessage: ['Cuestionemos esos pensamientos.'],
+    options: [], 
+  },
+  technique_thoughts_end: {
+    id: 'technique_thoughts_end',
+    botMessage: ['Bien trabajado.'],
+    options: [{ label: 'Entendido', next: 'end_positive' }],
+  },
+
+  // ══════════════════════════════════════════════════════
+  // RECURSOS Y CIERRE
+  // ══════════════════════════════════════════════════════
+  resources_info: {
+    id: 'resources_info',
+    isResources: true,
+    botMessage: 'Acá tenés los recursos gratuitos de la UNCo:',
+    options: [{ label: 'Volver al inicio', next: 'start' }],
+  },
+  resources_emergency: {
+    id: 'resources_emergency',
+    isResources: true,
+    isCrisis: true,
+    botMessage: 'Líneas de ayuda urgente y directa:',
+    options: [{ label: 'Volver al inicio', next: 'start' }],
+  },
+  end_positive: {
+    id: 'end_positive',
+    botMessage: ['Me alegro de haberte acompañado.', 'Acordate que estoy acá si me necesitás.'],
+    options: [{ label: 'Volver al inicio', next: 'start' }],
+  },
+};
+
+// Exportación por defecto para máxima compatibilidad
+export default DECISION_TREE;
