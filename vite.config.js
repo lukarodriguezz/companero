@@ -1,14 +1,23 @@
+// vite.config.js (Versión Final Blindada)
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { fileURLToPath, URL } from 'node:url'; // Import necesario para los alias
+import svgr from 'vite-plugin-svgr'; // <--- NUEVO IMPORT
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
   plugins: [
     react(),
+    // Configuramos svgr para que exporte el SVG como componente por defecto
+    svgr({ 
+      svgrOptions: {
+        icon: true, // Esto ayuda a manejar tamaños si se usa como icono
+      },
+    }),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
+      // Incluimos el nuevo SVG en los assets a pre-cachear por la PWA
+      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'assets/uncoma.svg'],
       manifest: {
         name: 'Compañero — Bienestar UNCo',
         short_name: 'Compañero',
@@ -32,7 +41,6 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Definimos que '@' apunte a la carpeta 'src'
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },

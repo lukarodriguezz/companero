@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-// Importación de componentes con alias @ y extensiones explícitas
+// Importación de componentes de vista
 import HomePage from "@/components/HomePage.jsx";
 import ChatContainer from "@/components/ChatContainer.jsx";
 import MoodTracker from "@/components/MoodTracker.jsx";
 import ResourcesPage from "@/components/ResourcesPage.jsx";
 import PanicModal from "@/components/PanicModal.jsx";
 
-// Importación de la lógica y datos centralizados
+// Importación de Assets y Configuración
+import UncomaLogo from "@/assets/uncoma.svg?react"; // Requiere vite-plugin-svgr
 import { DECISION_TREE } from "@/data/decisionTree.js";
 import { db } from "@/db.js"; 
 
 /**
- * Constantes de Configuración de Interfaz
+ * Configuración de Navegación y Títulos
  */
 const NAV_ITEMS = [
   { id: 'home',      icon: '🏠', label: 'Inicio'   },
@@ -28,23 +29,23 @@ const PAGE_TITLES = {
 };
 
 /**
- * App - Componente Principal (Root)
- * Orquestador de navegación y estados globales de la PWA.
+ * App - Orquestador Principal de Compañero UNCo
+ * Gestiona el ruteo interno, estados de emergencia y puntos de entrada al chat.
  */
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [isPanicModalOpen, setIsPanicModalOpen] = useState(false);
   
   /**
-   * Estado para controlar en qué nodo del árbol arranca el chat.
-   * Esto permite que la Home dispare flujos específicos (ej. Técnicas).
+   * Estado para inyectar el nodo inicial al ChatContainer.
+   * Permite que la Home dispare flujos como 'techniques_menu' directamente.
    */
   const [chatInitialNode, setChatInitialNode] = useState('start');
 
   /**
-   * Manejador de navegación inteligente.
-   * @param {string} targetPage - El ID de la página (home, chat, mood, resources).
-   * @param {string} nodeId - El ID del nodo del árbol (opcional, por defecto 'start').
+   * handleNavigation - Manejador de cambio de vista con inyección de contexto.
+   * @param {string} targetPage - ID de la página destino.
+   * @param {string} nodeId - ID del nodo inicial si el destino es el chat.
    */
   const handleNavigation = (targetPage, nodeId = 'start') => {
     if (targetPage === 'chat') {
@@ -57,7 +58,7 @@ export default function App() {
     <div style={{
       maxWidth: '430px', 
       margin: '0 auto', 
-      height: '100dvh', // Altura dinámica para evitar problemas en navegadores móviles
+      height: '100dvh', // Soporte para Viewport dinámico en móviles
       display: 'flex', 
       flexDirection: 'column',
       background: 'var(--bg1)', 
@@ -79,21 +80,19 @@ export default function App() {
         zIndex: 50
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Logo UNCo SVG */}
           <div style={{
-            width: 36, 
-            height: 36, 
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #1A8E68 0%, #1A56A0 100%)',
+            width: 38, 
+            height: 38, 
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: 'center', 
-            fontSize: 18,
-            boxShadow: '0 2px 8px rgba(26,86,160,0.2)'
+            justifyContent: 'center'
           }}>
-            🤝
+            <UncomaLogo style={{ width: '100%', height: '100%' }} />
           </div>
+          
           <div>
-            <p style={{ margin: 0, fontWeight: 800, fontSize: '14px', letterSpacing: '-0.02em' }}>
+            <p style={{ margin: 0, fontWeight: 800, fontSize: '14px', letterSpacing: '-0.02em', color: 'var(--t1)' }}>
               Compañero UNCo
             </p>
             <p style={{ margin: 0, fontSize: '11px', color: 'var(--t2)', fontWeight: 500 }}>
@@ -113,14 +112,17 @@ export default function App() {
             fontSize: '12px', 
             fontWeight: 700, 
             cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(163,32,32,0.2)'
+            boxShadow: '0 2px 6px rgba(163,32,32,0.2)',
+            transition: 'transform 0.1s active'
           }}
+          onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+          onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
           🆘 SOS
         </button>
       </header>
 
-      {/* ── ÁREA DE CONTENIDO (ROUTER) ── */}
+      {/* ── ÁREA DE CONTENIDO (ROUTER DINÁMICO) ── */}
       <main style={{ 
         flex: 1, 
         overflow: 'hidden', 
@@ -157,7 +159,7 @@ export default function App() {
         )}
       </main>
 
-      {/* ── NAVEGACIÓN INFERIOR ── */}
+      {/* ── NAVEGACIÓN INFERIOR (TAB BAR) ── */}
       <nav style={{
         borderTop: '1px solid var(--b3)',
         display: 'flex', 
@@ -185,7 +187,9 @@ export default function App() {
           >
             <span style={{ 
               fontSize: 20, 
-              opacity: currentPage === item.id ? 1 : 0.5 
+              opacity: currentPage === item.id ? 1 : 0.4,
+              transform: currentPage === item.id ? 'scale(1.1)' : 'scale(1)',
+              transition: 'transform 0.2s ease'
             }}>
               {item.icon}
             </span>
@@ -200,7 +204,7 @@ export default function App() {
         ))}
       </nav>
 
-      {/* MODAL GLOBAL DE SOS */}
+      {/* MODAL GLOBAL DE EMERGENCIA */}
       {isPanicModalOpen && (
         <PanicModal onClose={() => setIsPanicModalOpen(false)} />
       )}
