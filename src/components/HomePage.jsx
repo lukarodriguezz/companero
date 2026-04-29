@@ -1,25 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+// Importamos los tips desde el archivo de configuración
+import { TIPS } from '@/config/tips.js';
 
 /**
- * HomePage - Versión Final Consolidada
- * Integra widgets informativos con el menú de acciones principales.
+ * HomePage - Versión Final Blindada
+ * Orquestador de entrada que mezcla widgets informativos y acciones de control.
  */
 const HomePage = ({ onNavigate, onOpenPanic }) => {
+  const [dailyTip, setDailyTip] = useState("");
 
-  // Dato del día: Mantenemos la lógica de info útil para el estudiante
-  const dailyTip = {
-    title: "Dato del día",
-    content: "Caminar 10 minutos entre bloques de estudio reduce el cortisol y mejora la retención de memoria a largo plazo.",
-    icon: "💡"
-  };
+  // Selección aleatoria del dato del día al montar el componente
+  useEffect(() => {
+    if (TIPS && TIPS.length > 0) {
+      const randomIndex = Math.floor(Math.random() * TIPS.length);
+      setDailyTip(TIPS[randomIndex]);
+    }
+  }, []);
 
+  /**
+   * Definición de Acciones Principales
+   * Estructura de datos limpia para renderizado dinámico.
+   */
   const ACTIONS = [
     {
       id: 'chat_start',
       title: 'Hablar con mi compañero',
       desc: 'Inicia un diálogo guiado para desahogarte o buscar apoyo.',
       icon: '💬',
-      color: '#1A56A0',
+      color: '#1A56A0', // Azul Institucional
       action: () => onNavigate('chat', 'start')
     },
     {
@@ -27,7 +35,7 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
       title: 'Aprender técnicas',
       desc: 'Herramientas rápidas para ansiedad, agobio o crisis.',
       icon: '🧠',
-      color: '#1A8E68',
+      color: '#1A8E68', // Verde Bienestar
       action: () => onNavigate('chat', 'techniques_menu')
     },
     {
@@ -35,7 +43,7 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
       title: 'Registrar cómo me siento',
       desc: 'Llevá un seguimiento de tu evolución emocional semanal.',
       icon: '📊',
-      color: '#6366f1',
+      color: '#6366f1', // Indigo Visualización
       action: () => onNavigate('mood')
     },
     {
@@ -43,7 +51,7 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
       title: 'S.O.S',
       desc: 'Líneas de emergencia y ayuda inmediata 24hs.',
       icon: '🆘',
-      color: '#A32020',
+      color: '#A32020', // Rojo Alerta
       isUrgent: true,
       action: () => onOpenPanic()
     }
@@ -51,21 +59,21 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
 
   return (
     <div style={{
-      padding: '24px 20px',
+      padding: '28px 20px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '24px',
+      gap: '28px',
       animation: 'fadeIn 0.5s ease-out'
     }}>
       
-      {/* ── SECCIÓN: ENCABEZADO ── */}
-      <section>
+      {/* ── SECCIÓN 1: BIENVENIDA ── */}
+      <header>
         <h1 style={{ 
           fontSize: '24px', 
           fontWeight: 800, 
           margin: '0 0 8px 0', 
           color: 'var(--t1)',
-          letterSpacing: '-0.03em'
+          letterSpacing: '-0.02em'
         }}>
           Hola, Luka 🤝
         </h1>
@@ -73,61 +81,65 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
           fontSize: '15px', 
           color: 'var(--t2)', 
           lineHeight: '1.5',
-          margin: 0 
+          margin: 0,
+          fontWeight: 500
         }}>
-          Bienvenido a tu espacio de bienestar UNCo.
+          Bienvenido a tu espacio de apoyo emocional en la UNCo.
         </p>
-      </section>
+      </header>
 
-      {/* ── SECCIÓN: WIDGET INFORMATIVO (Dato del día) ── */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(26,142,104,0.1) 0%, rgba(26,86,160,0.1) 100%)',
-        padding: '20px',
-        borderRadius: '18px',
-        border: '1px solid rgba(26,142,104,0.2)',
-        display: 'flex',
-        gap: '16px',
-        alignItems: 'flex-start'
-      }}>
-        <span style={{ fontSize: '24px' }}>{dailyTip.icon}</span>
-        <div>
-          <p style={{ 
-            margin: '0 0 6px 0', 
-            fontWeight: 700, 
-            fontSize: '14px', 
-            color: '#1A8E68',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em'
-          }}>
-            {dailyTip.title}
-          </p>
-          <p style={{ 
-            margin: 0, 
-            fontSize: '13.5px', 
-            color: 'var(--t1)', 
-            lineHeight: '1.5',
-            fontWeight: 500
-          }}>
-            {dailyTip.content}
-          </p>
+      {/* ── SECCIÓN 2: WIDGET DINÁMICO (Dato del día) ── */}
+      {dailyTip && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(26,142,104,0.08) 0%, rgba(26,86,160,0.08) 100%)',
+          padding: '20px',
+          borderRadius: '20px',
+          border: '1px solid var(--b3)',
+          display: 'flex',
+          gap: '16px',
+          alignItems: 'flex-start',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
+        }}>
+          <span style={{ fontSize: '26px' }}>💡</span>
+          <div>
+            <p style={{ 
+              margin: '0 0 6px 0', 
+              fontWeight: 800, 
+              fontSize: '12px', 
+              color: '#1A8E68',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em'
+            }}>
+              Dato del día
+            </p>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '14px', 
+              color: 'var(--t1)', 
+              lineHeight: '1.5',
+              fontWeight: 500
+            }}>
+              {dailyTip}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* ── SECCIÓN: ACCIONES PRINCIPALES ── */}
+      {/* ── SECCIÓN 3: ACCIONES TRONCALES ── */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px'
+        gap: '14px'
       }}>
         <p style={{ 
           fontSize: '12px', 
           fontWeight: 700, 
           color: 'var(--t2)', 
           textTransform: 'uppercase', 
-          letterSpacing: '0.05em',
+          letterSpacing: '0.06em',
           marginLeft: '4px'
         }}>
-          ¿Qué necesitás ahora?
+          ¿Qué necesitás hoy?
         </p>
         
         {ACTIONS.map((item) => (
@@ -137,22 +149,22 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '16px',
-              padding: '18px',
-              borderRadius: '16px',
+              gap: '18px',
+              padding: '20px',
+              borderRadius: '18px',
               border: item.isUrgent ? '2px solid #A32020' : '1px solid var(--b3)',
               background: 'var(--bg1)',
               textAlign: 'left',
               cursor: 'pointer',
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.03)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
               position: 'relative',
               overflow: 'hidden'
             }}
             onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
             onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            {/* Indicador de Color Lateral */}
+            {/* Indicador de Color Lateral Industrial */}
             <div style={{
               position: 'absolute',
               left: 0,
@@ -162,20 +174,25 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
               background: item.color
             }} />
 
-            <span style={{ fontSize: '30px' }}>{item.icon}</span>
+            <span style={{ 
+              fontSize: '32px',
+              filter: item.isUrgent ? 'none' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+            }}>
+              {item.icon}
+            </span>
 
             <div style={{ flex: 1 }}>
               <p style={{ 
-                margin: '0 0 2px 0', 
+                margin: '0 0 4px 0', 
                 fontWeight: 700, 
-                fontSize: '15px',
+                fontSize: '16px',
                 color: item.isUrgent ? '#A32020' : 'var(--t1)'
               }}>
                 {item.title}
               </p>
               <p style={{ 
                 margin: 0, 
-                fontSize: '12px', 
+                fontSize: '12.5px', 
                 color: 'var(--t2)',
                 lineHeight: '1.4'
               }}>
@@ -183,19 +200,27 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
               </p>
             </div>
             
-            <span style={{ opacity: 0.2, fontSize: '18px' }}>→</span>
+            <span style={{ opacity: 0.2, fontSize: '20px' }}>→</span>
           </button>
         ))}
       </div>
 
-      {/* ── FOOTER ── */}
+      {/* ── SECCIÓN 4: FOOTER INSTITUCIONAL ── */}
       <footer style={{ 
         marginTop: 'auto', 
-        padding: '20px 0',
+        padding: '24px 0',
         textAlign: 'center',
-        borderTop: '1px solid var(--b3)'
+        borderTop: '1px solid var(--b3)',
+        opacity: 0.6
       }}>
-        <p style={{ fontSize: '11px', color: 'var(--t2)', opacity: 0.6, fontWeight: 500 }}>
+        <p style={{ 
+          fontSize: '11px', 
+          color: 'var(--t2)', 
+          margin: 0,
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
           Secretaría de Bienestar Estudiantil — UNCo
         </p>
       </footer>
