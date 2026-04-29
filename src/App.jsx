@@ -10,7 +10,7 @@ import PanicModal from "@/components/PanicModal.jsx";
 
 // Assets y Datos
 // Nota: Requiere vite-plugin-svgr para importar como componente React
-import UncomaLogo from "@/assets/uncoma.svg?react"; 
+import UncomaLogo from "@/assets/uncoma.svg"; 
 import { DECISION_TREE } from "@/data/decisionTree.js";
 import { db } from "@/db.js"; 
 
