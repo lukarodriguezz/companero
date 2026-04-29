@@ -75,7 +75,7 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
           color: 'var(--t1)',
           letterSpacing: '-0.02em'
         }}>
-          Hola, Luka 🤝
+          Hola 🤝
         </h1>
         <p style={{ 
           fontSize: '15px', 
