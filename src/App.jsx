@@ -1,18 +1,21 @@
+
 import React, { useState } from "react";
-// Importación de componentes de vista
+
+// Componentes de Interfaz
 import HomePage from "@/components/HomePage.jsx";
 import ChatContainer from "@/components/ChatContainer.jsx";
 import MoodTracker from "@/components/MoodTracker.jsx";
 import ResourcesPage from "@/components/ResourcesPage.jsx";
 import PanicModal from "@/components/PanicModal.jsx";
 
-// Importación de Assets y Configuración
-import UncomaLogo from "@/assets/uncoma.svg?react"; // Requiere vite-plugin-svgr
+// Assets y Datos
+// Nota: Requiere vite-plugin-svgr para importar como componente React
+import UncomaLogo from "@/assets/uncoma.svg?react"; 
 import { DECISION_TREE } from "@/data/decisionTree.js";
 import { db } from "@/db.js"; 
 
 /**
- * Configuración de Navegación y Títulos
+ * Configuración de Navegación
  */
 const NAV_ITEMS = [
   { id: 'home',      icon: '🏠', label: 'Inicio'   },
@@ -28,24 +31,18 @@ const PAGE_TITLES = {
   resources: 'Red de Apoyo',
 };
 
-/**
- * App - Orquestador Principal de Compañero UNCo
- * Gestiona el ruteo interno, estados de emergencia y puntos de entrada al chat.
- */
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [isPanicModalOpen, setIsPanicModalOpen] = useState(false);
   
   /**
-   * Estado para inyectar el nodo inicial al ChatContainer.
-   * Permite que la Home dispare flujos como 'techniques_menu' directamente.
+   * Estado para controlar el punto de entrada al chat.
+   * Permite que la Home dispare nodos específicos (ej. techniques_menu).
    */
   const [chatInitialNode, setChatInitialNode] = useState('start');
 
   /**
-   * handleNavigation - Manejador de cambio de vista con inyección de contexto.
-   * @param {string} targetPage - ID de la página destino.
-   * @param {string} nodeId - ID del nodo inicial si el destino es el chat.
+   * handleNavigation - Orquestador de ruteo interno.
    */
   const handleNavigation = (targetPage, nodeId = 'start') => {
     if (targetPage === 'chat') {
@@ -58,7 +55,7 @@ export default function App() {
     <div style={{
       maxWidth: '430px', 
       margin: '0 auto', 
-      height: '100dvh', // Soporte para Viewport dinámico en móviles
+      height: '100dvh', // Altura dinámica para navegadores móviles
       display: 'flex', 
       flexDirection: 'column',
       background: 'var(--bg1)', 
@@ -80,15 +77,23 @@ export default function App() {
         zIndex: 50
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* Logo UNCo SVG */}
+          
+          {/* CONTENEDOR DEL LOGO: Solución a problemas de visibilidad en Desktop/Mobile */}
           <div style={{
-            width: 38, 
-            height: 38, 
+            width: 40, 
+            height: 40, 
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: 'center'
+            justifyContent: 'center',
+            flexShrink: 0,
+            background: '#FFFFFF', // Fondo blanco para contraste del SVG
+            borderRadius: '50%',
+            border: '1px solid var(--b3)',
+            padding: '2px', // Espaciado interno para que el logo no toque los bordes
+            overflow: 'hidden',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
           }}>
-            <UncomaLogo style={{ width: '100%', height: '100%' }} />
+            <UncomaLogo style={{ width: '85%', height: '85%' }} />
           </div>
           
           <div>
@@ -122,7 +127,7 @@ export default function App() {
         </button>
       </header>
 
-      {/* ── ÁREA DE CONTENIDO (ROUTER DINÁMICO) ── */}
+      {/* ── MAIN CONTENT (ROUTER) ── */}
       <main style={{ 
         flex: 1, 
         overflow: 'hidden', 
@@ -165,7 +170,7 @@ export default function App() {
         display: 'flex', 
         flexShrink: 0,
         background: 'var(--bg1)',
-        paddingBottom: 'calc(8px + env(safe-area-inset-bottom))',
+        paddingBottom: 'calc(8px + env(safe-area-inset-bottom))', // Soporte para barra de gestos
       }}>
         {NAV_ITEMS.map(item => (
           <button 
@@ -204,7 +209,7 @@ export default function App() {
         ))}
       </nav>
 
-      {/* MODAL GLOBAL DE EMERGENCIA */}
+      {/* MODALES GLOBALES */}
       {isPanicModalOpen && (
         <PanicModal onClose={() => setIsPanicModalOpen(false)} />
       )}
