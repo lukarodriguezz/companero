@@ -1,67 +1,69 @@
 import React from 'react';
 
 /**
- * HomePage - Punto de entrada y panel de control del usuario.
- * @param {Function} onNavigate - Función de enrutamiento: (page, nodeId).
- * @param {Function} onOpenPanic - Disparador del modal de emergencia global.
+ * HomePage - Versión Final Consolidada
+ * Integra widgets informativos con el menú de acciones principales.
  */
 const HomePage = ({ onNavigate, onOpenPanic }) => {
 
-  /**
-   * Configuración de Acciones Principales
-   * Centralizamos la data para mantener el renderizado limpio (DRY).
-   */
-  const MAIN_ACTIONS = [
+  // Dato del día: Mantenemos la lógica de info útil para el estudiante
+  const dailyTip = {
+    title: "Dato del día",
+    content: "Caminar 10 minutos entre bloques de estudio reduce el cortisol y mejora la retención de memoria a largo plazo.",
+    icon: "💡"
+  };
+
+  const ACTIONS = [
     {
       id: 'chat_start',
       title: 'Hablar con mi compañero',
-      desc: 'Inicia un diálogo guiado para desahogarte o buscar claridad.',
+      desc: 'Inicia un diálogo guiado para desahogarte o buscar apoyo.',
       icon: '💬',
       color: '#1A56A0',
-      handler: () => onNavigate('chat', 'start')
+      action: () => onNavigate('chat', 'start')
     },
     {
-      id: 'chat_techniques',
+      id: 'chat_tech',
       title: 'Aprender técnicas',
-      desc: 'Ejercicios rápidos para ansiedad, agobio o crisis.',
+      desc: 'Herramientas rápidas para ansiedad, agobio o crisis.',
       icon: '🧠',
       color: '#1A8E68',
-      handler: () => onNavigate('chat', 'techniques_menu')
+      action: () => onNavigate('chat', 'techniques_menu')
     },
     {
-      id: 'mood_tracker',
+      id: 'mood_reg',
       title: 'Registrar cómo me siento',
-      desc: 'Mapeá tu evolución emocional y detectá patrones.',
+      desc: 'Llevá un seguimiento de tu evolución emocional semanal.',
       icon: '📊',
       color: '#6366f1',
-      handler: () => onNavigate('mood')
+      action: () => onNavigate('mood')
     },
     {
-      id: 'sos_protocol',
+      id: 'sos_direct',
       title: 'S.O.S',
-      desc: 'Ayuda inmediata y contactos críticos de emergencia.',
+      desc: 'Líneas de emergencia y ayuda inmediata 24hs.',
       icon: '🆘',
       color: '#A32020',
-      isCritical: true,
-      handler: () => onOpenPanic()
+      isUrgent: true,
+      action: () => onOpenPanic()
     }
   ];
 
   return (
     <div style={{
-      padding: '28px 20px',
+      padding: '24px 20px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '28px',
+      gap: '24px',
       animation: 'fadeIn 0.5s ease-out'
     }}>
       
-      {/* ── SECCIÓN: BIENVENIDA ── */}
-      <header>
+      {/* ── SECCIÓN: ENCABEZADO ── */}
+      <section>
         <h1 style={{ 
           fontSize: '24px', 
           fontWeight: 800, 
-          margin: '0 0 10px 0', 
+          margin: '0 0 8px 0', 
           color: 'var(--t1)',
           letterSpacing: '-0.03em'
         }}>
@@ -70,108 +72,131 @@ const HomePage = ({ onNavigate, onOpenPanic }) => {
         <p style={{ 
           fontSize: '15px', 
           color: 'var(--t2)', 
-          lineHeight: '1.6',
-          margin: 0,
-          maxWidth: '90%'
+          lineHeight: '1.5',
+          margin: 0 
         }}>
-          Este es tu espacio seguro de apoyo emocional en la UNCo. ¿Por dónde querés empezar hoy?
+          Bienvenido a tu espacio de bienestar UNCo.
         </p>
-      </header>
+      </section>
 
-      {/* ── SECCIÓN: GRID DE ACCIONES ── */}
+      {/* ── SECCIÓN: WIDGET INFORMATIVO (Dato del día) ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(26,142,104,0.1) 0%, rgba(26,86,160,0.1) 100%)',
+        padding: '20px',
+        borderRadius: '18px',
+        border: '1px solid rgba(26,142,104,0.2)',
+        display: 'flex',
+        gap: '16px',
+        alignItems: 'flex-start'
+      }}>
+        <span style={{ fontSize: '24px' }}>{dailyTip.icon}</span>
+        <div>
+          <p style={{ 
+            margin: '0 0 6px 0', 
+            fontWeight: 700, 
+            fontSize: '14px', 
+            color: '#1A8E68',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
+          }}>
+            {dailyTip.title}
+          </p>
+          <p style={{ 
+            margin: 0, 
+            fontSize: '13.5px', 
+            color: 'var(--t1)', 
+            lineHeight: '1.5',
+            fontWeight: 500
+          }}>
+            {dailyTip.content}
+          </p>
+        </div>
+      </div>
+
+      {/* ── SECCIÓN: ACCIONES PRINCIPALES ── */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '14px'
+        gap: '12px'
       }}>
-        {MAIN_ACTIONS.map((action) => (
+        <p style={{ 
+          fontSize: '12px', 
+          fontWeight: 700, 
+          color: 'var(--t2)', 
+          textTransform: 'uppercase', 
+          letterSpacing: '0.05em',
+          marginLeft: '4px'
+        }}>
+          ¿Qué necesitás ahora?
+        </p>
+        
+        {ACTIONS.map((item) => (
           <button
-            key={action.id}
-            onClick={action.handler}
+            key={item.id}
+            onClick={item.action}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '18px',
-              padding: '20px',
-              borderRadius: '18px',
-              border: action.isCritical ? '2px solid #A32020' : '1px solid var(--b3)',
+              gap: '16px',
+              padding: '18px',
+              borderRadius: '16px',
+              border: item.isUrgent ? '2px solid #A32020' : '1px solid var(--b3)',
               background: 'var(--bg1)',
               textAlign: 'left',
               cursor: 'pointer',
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.03)',
               position: 'relative',
               overflow: 'hidden'
             }}
             onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
             onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            {/* Indicador de Categoría Lateral */}
+            {/* Indicador de Color Lateral */}
             <div style={{
               position: 'absolute',
               left: 0,
               top: 0,
               bottom: 0,
               width: '5px',
-              background: action.color
+              background: item.color
             }} />
 
-            <span style={{ 
-              fontSize: '32px',
-              filter: action.isCritical ? 'none' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.08))'
-            }}>
-              {action.icon}
-            </span>
+            <span style={{ fontSize: '30px' }}>{item.icon}</span>
 
             <div style={{ flex: 1 }}>
               <p style={{ 
-                margin: '0 0 4px 0', 
+                margin: '0 0 2px 0', 
                 fontWeight: 700, 
-                fontSize: '16px',
-                color: action.isCritical ? '#A32020' : 'var(--t1)',
-                letterSpacing: '-0.01em'
+                fontSize: '15px',
+                color: item.isUrgent ? '#A32020' : 'var(--t1)'
               }}>
-                {action.title}
+                {item.title}
               </p>
               <p style={{ 
                 margin: 0, 
-                fontSize: '12.5px', 
+                fontSize: '12px', 
                 color: 'var(--t2)',
-                lineHeight: '1.4',
-                opacity: 0.9
+                lineHeight: '1.4'
               }}>
-                {action.desc}
+                {item.desc}
               </p>
             </div>
-
-            <span style={{ 
-              opacity: 0.2, 
-              fontSize: '18px',
-              fontWeight: 300 
-            }}>
-              →
-            </span>
+            
+            <span style={{ opacity: 0.2, fontSize: '18px' }}>→</span>
           </button>
         ))}
       </div>
 
-      {/* ── SECCIÓN: FOOTER INSTITUCIONAL ── */}
+      {/* ── FOOTER ── */}
       <footer style={{ 
         marginTop: 'auto', 
-        padding: '24px 0',
+        padding: '20px 0',
         textAlign: 'center',
-        borderTop: '1px solid var(--b3)',
-        opacity: 0.5
+        borderTop: '1px solid var(--b3)'
       }}>
-        <p style={{ 
-          fontSize: '11px', 
-          color: 'var(--t2)', 
-          margin: 0,
-          fontWeight: 500,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em'
-        }}>
-          Bienestar Estudiantil — Universidad Nacional del Comahue
+        <p style={{ fontSize: '11px', color: 'var(--t2)', opacity: 0.6, fontWeight: 500 }}>
+          Secretaría de Bienestar Estudiantil — UNCo
         </p>
       </footer>
 
