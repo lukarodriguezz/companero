@@ -1,129 +1,182 @@
-import { useMoodHistory } from '../hooks/useMoodHistory';
+import React from 'react';
 
-const MOOD_OPTIONS = [
-  { value: 1, emoji: '😔', label: 'Muy mal',  color: '#C94040' },
-  { value: 2, emoji: '😟', label: 'Mal',      color: '#D4832A' },
-  { value: 3, emoji: '😐', label: 'Regular',  color: '#7A7A74' },
-  { value: 4, emoji: '🙂', label: 'Bien',     color: '#5A8F1A' },
-  { value: 5, emoji: '😊', label: 'Muy bien', color: '#1A8E68' },
-];
+/**
+ * HomePage - Punto de entrada y panel de control del usuario.
+ * @param {Function} onNavigate - Función de enrutamiento: (page, nodeId).
+ * @param {Function} onOpenPanic - Disparador del modal de emergencia global.
+ */
+const HomePage = ({ onNavigate, onOpenPanic }) => {
 
-const QUICK_ACTIONS = [
-  { icon: '😔', label: 'Me fue mal en un examen',       desc: 'Flujo anti-abandono',        page: 'chat' },
-  { icon: '😰', label: 'Tengo un examen próximo',        desc: 'Triage + técnicas de calma', page: 'chat' },
-  { icon: '💬', label: 'Hablar con mi compañero',        desc: 'Chat completo',              page: 'chat' },
-  { icon: '🌬', label: 'Técnica rápida de respiración', desc: 'Respiración 4-7-8',          page: 'chat' },
-  { icon: '📊', label: 'Registrar cómo me siento',      desc: 'Historial de ánimo',         page: 'mood' },
-];
-
-export default function HomePage({ onNavigate }) {
-  const { history, todayEntry } = useMoodHistory();
-  const mood = MOOD_OPTIONS.find(m => m.value === todayEntry?.value);
-
-  const avg = history.length > 0
-    ? (history.slice(0, 7).reduce((s, e) => s + e.value, 0) / Math.min(history.length, 7)).toFixed(1)
-    : null;
+  /**
+   * Configuración de Acciones Principales
+   * Centralizamos la data para mantener el renderizado limpio (DRY).
+   */
+  const MAIN_ACTIONS = [
+    {
+      id: 'chat_start',
+      title: 'Hablar con mi compañero',
+      desc: 'Inicia un diálogo guiado para desahogarte o buscar claridad.',
+      icon: '💬',
+      color: '#1A56A0',
+      handler: () => onNavigate('chat', 'start')
+    },
+    {
+      id: 'chat_techniques',
+      title: 'Aprender técnicas',
+      desc: 'Ejercicios rápidos para ansiedad, agobio o crisis.',
+      icon: '🧠',
+      color: '#1A8E68',
+      handler: () => onNavigate('chat', 'techniques_menu')
+    },
+    {
+      id: 'mood_tracker',
+      title: 'Registrar cómo me siento',
+      desc: 'Mapeá tu evolución emocional y detectá patrones.',
+      icon: '📊',
+      color: '#6366f1',
+      handler: () => onNavigate('mood')
+    },
+    {
+      id: 'sos_protocol',
+      title: 'S.O.S',
+      desc: 'Ayuda inmediata y contactos críticos de emergencia.',
+      icon: '🆘',
+      color: '#A32020',
+      isCritical: true,
+      handler: () => onOpenPanic()
+    }
+  ];
 
   return (
-    <div style={{ padding: 16 }}>
-
-      {/* Saludo */}
-      <div style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 22, fontWeight: 700, margin: '0 0 3px' }}>Hola 👋</p>
-        <p style={{ fontSize: 14, color: 'var(--t2)', margin: 0 }}>
-          Compañero de bienestar de la <strong>UNCo</strong>
-        </p>
-      </div>
-
-      {/* Estado de hoy */}
-      <div
-        onClick={() => onNavigate('mood')}
-        style={{
-          background: 'var(--bg2)', borderRadius: 14, padding: '14px',
-          marginBottom: 10, cursor: 'pointer',
-        }}
-      >
-        <p style={{
-          fontSize: 11, color: 'var(--t2)', textTransform: 'uppercase',
-          letterSpacing: '.06em', margin: '0 0 8px', fontWeight: 500,
+    <div style={{
+      padding: '28px 20px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '28px',
+      animation: 'fadeIn 0.5s ease-out'
+    }}>
+      
+      {/* ── SECCIÓN: BIENVENIDA ── */}
+      <header>
+        <h1 style={{ 
+          fontSize: '24px', 
+          fontWeight: 800, 
+          margin: '0 0 10px 0', 
+          color: 'var(--t1)',
+          letterSpacing: '-0.03em'
         }}>
-          Estado de hoy
+          Hola, Luka 🤝
+        </h1>
+        <p style={{ 
+          fontSize: '15px', 
+          color: 'var(--t2)', 
+          lineHeight: '1.6',
+          margin: 0,
+          maxWidth: '90%'
+        }}>
+          Este es tu espacio seguro de apoyo emocional en la UNCo. ¿Por dónde querés empezar hoy?
         </p>
-        {todayEntry ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 28 }}>{mood?.emoji}</span>
-            <div>
-              <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: mood?.color }}>
-                {mood?.label}
-              </p>
-              {todayEntry.note && (
-                <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--t2)' }}>{todayEntry.note}</p>
-              )}
-            </div>
-          </div>
-        ) : (
-          <p style={{ fontSize: 14, color: 'var(--t2)', margin: 0 }}>
-            Todavía no registraste → Tocar para registrar
-          </p>
-        )}
-      </div>
+      </header>
 
-      {/* Stats */}
-      {avg && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-          {[
-            { label: 'Promedio 7 días',  value: avg,           unit: ' / 5' },
-            { label: 'Días registrados', value: history.length, unit: '' },
-          ].map((s, i) => (
-            <div key={i} style={{ background: 'var(--bg2)', borderRadius: 12, padding: '10px 12px' }}>
-              <p style={{
-                fontSize: 11, color: 'var(--t2)', margin: '0 0 3px',
-                textTransform: 'uppercase', letterSpacing: '.05em',
+      {/* ── SECCIÓN: GRID DE ACCIONES ── */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '14px'
+      }}>
+        {MAIN_ACTIONS.map((action) => (
+          <button
+            key={action.id}
+            onClick={action.handler}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '18px',
+              padding: '20px',
+              borderRadius: '18px',
+              border: action.isCritical ? '2px solid #A32020' : '1px solid var(--b3)',
+              background: 'var(--bg1)',
+              textAlign: 'left',
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            {/* Indicador de Categoría Lateral */}
+            <div style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: '5px',
+              background: action.color
+            }} />
+
+            <span style={{ 
+              fontSize: '32px',
+              filter: action.isCritical ? 'none' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.08))'
+            }}>
+              {action.icon}
+            </span>
+
+            <div style={{ flex: 1 }}>
+              <p style={{ 
+                margin: '0 0 4px 0', 
+                fontWeight: 700, 
+                fontSize: '16px',
+                color: action.isCritical ? '#A32020' : 'var(--t1)',
+                letterSpacing: '-0.01em'
               }}>
-                {s.label}
+                {action.title}
               </p>
-              <p style={{ fontWeight: 700, fontSize: 20, margin: 0 }}>
-                {s.value}
-                <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--t2)' }}>{s.unit}</span>
+              <p style={{ 
+                margin: 0, 
+                fontSize: '12.5px', 
+                color: 'var(--t2)',
+                lineHeight: '1.4',
+                opacity: 0.9
+              }}>
+                {action.desc}
               </p>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Accesos rápidos */}
-      <p style={{ fontWeight: 600, fontSize: 14, margin: '0 0 8px' }}>¿Qué necesitás ahora?</p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 14 }}>
-        {QUICK_ACTIONS.map((q, i) => (
-          <button key={i} onClick={() => onNavigate(q.page)} style={{
-            display: 'flex', alignItems: 'center', gap: 12,
-            background: 'var(--bg2)', border: '1px solid var(--b3)',
-            borderRadius: 12, padding: '12px 14px', cursor: 'pointer',
-            fontFamily: 'inherit', textAlign: 'left', width: '100%',
-          }}>
-            <span style={{ fontSize: 20 }}>{q.icon}</span>
-            <div>
-              <p style={{ margin: 0, fontWeight: 500, fontSize: 14, color: 'var(--t1)' }}>{q.label}</p>
-              <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--t2)' }}>{q.desc}</p>
-            </div>
+            <span style={{ 
+              opacity: 0.2, 
+              fontSize: '18px',
+              fontWeight: 300 
+            }}>
+              →
+            </span>
           </button>
         ))}
       </div>
 
-      {/* Dato del día */}
-      <div style={{
-        background: 'rgba(26,142,104,.08)', border: '1px solid rgba(26,142,104,.25)',
-        borderRadius: 12, padding: '14px',
+      {/* ── SECCIÓN: FOOTER INSTITUCIONAL ── */}
+      <footer style={{ 
+        marginTop: 'auto', 
+        padding: '24px 0',
+        textAlign: 'center',
+        borderTop: '1px solid var(--b3)',
+        opacity: 0.5
       }}>
-        <p style={{ fontSize: 12, color: '#085041', fontWeight: 600, margin: '0 0 3px' }}>
-          💡 Dato del día
+        <p style={{ 
+          fontSize: '11px', 
+          color: 'var(--t2)', 
+          margin: 0,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
+          Bienestar Estudiantil — Universidad Nacional del Comahue
         </p>
-        <p style={{ fontSize: 13, color: '#085041', margin: 0, lineHeight: 1.6 }}>
-          El 70% de los estudiantes universitarios experimenta el síndrome del impostor.
-          No estás solo/a en esto.
-        </p>
-      </div>
+      </footer>
 
     </div>
   );
-}
+};
+
+export default HomePage;
