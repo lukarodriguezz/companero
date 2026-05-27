@@ -4,6 +4,7 @@
 // al volver retoma exactamente donde estaba.
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../db';
+import { logger } from '../utils/logger';
 
 export function useChatState() {
   const [initialState, setInitialState] = useState(null); // { nodeId, messages } | null
@@ -17,7 +18,7 @@ export function useChatState() {
           setInitialState({ nodeId: row.nodeId, messages: row.messages });
         }
       } catch (err) {
-        console.error('[useChatState] load:', err);
+        logger.error('[useChatState] load:', err);
       } finally {
         setReady(true);
       }
@@ -41,7 +42,7 @@ export function useChatState() {
         updatedAt: Date.now(),
       });
     } catch (err) {
-      console.error('[useChatState] persist:', err);
+      logger.error('[useChatState] persist:', err);
     }
   }, []);
 
@@ -51,7 +52,7 @@ export function useChatState() {
       await db.chat_state.clear();
       setInitialState(null);
     } catch (err) {
-      console.error('[useChatState] clear:', err);
+      logger.error('[useChatState] clear:', err);
     }
   }, []);
 

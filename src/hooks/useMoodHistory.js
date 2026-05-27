@@ -2,6 +2,7 @@
 // Abstrae toda la persistencia del historial de ánimo con IndexedDB.
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../db';
+import { logger } from '../utils/logger';
 
 const todayStr = () => new Date().toISOString().split('T')[0];
 
@@ -18,7 +19,7 @@ export function useMoodHistory() {
         .toArray();
       setHistory(entries);
     } catch (err) {
-      console.error('[useMoodHistory] load:', err);
+      logger.error('[useMoodHistory] load:', err);
     } finally {
       setLoading(false);
     }
@@ -35,7 +36,7 @@ export function useMoodHistory() {
       await load();
       return true;
     } catch (err) {
-      console.error('[useMoodHistory] saveEntry:', err);
+      logger.error('[useMoodHistory] saveEntry:', err);
       return false;
     }
   }, [load]);
